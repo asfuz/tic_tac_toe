@@ -55,6 +55,11 @@ class DB
         self::$connection->query($sql);
     }
 
+    public static function get_requests(){
+        $sql = "SELECT * FROM `requests`";
+        return self::$connection->query($sql)->fetch_all(MYSQLI_ASSOC);
+    }
+
 
     public function __destruct(){
         self::$connection->close();

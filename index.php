@@ -28,7 +28,7 @@ if (isset($_SESSION['name'])) {
         app\DB::connect();
         app\DB::add_to_online($name);
 
-        header("Location: game.php");
+        header("Location: wait.php");
         exit();
     }
     ?>
