@@ -17,8 +17,6 @@
     <body>
       <div><h1> Tic Tac Toe Game</h1></div>
         <div class="wrap">
-
-   
 <header>
   
     <div id="x_win"> <i class="fa fa-times" aria-hidden="true"> </i> <div id="xx"> wins </div></div>
@@ -56,9 +54,7 @@
         <div id="around">
           <button id="butt_reset" onclick="reset(), button();" value="RESET"> <i class="fa fa-refresh " aria-hidden="true"></i> </button>
         </div>
-        <h3 id="result"> # result </h3>
-
-
+        <h3 id="result"> #result </h3>
       </footer>
       </div>
         

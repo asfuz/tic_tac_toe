@@ -5,10 +5,10 @@ error_reporting(E_ALL);
 
 session_start();
 
-if (isset($_SESSION['name'])) {
-    header("Location: online.php");
-    exit();
-}
+// if (isset($_SESSION['name'])) {
+//     header("Location: online.php");
+//     exit();
+// }
 
 ?>
 <!DOCTYPE html>
@@ -25,6 +25,7 @@ if (isset($_SESSION['name'])) {
         echo 'hello';
         include_once 'DB.php';
         $name =  trim(htmlspecialchars($_POST['name']));
+        $_SESSION['name'] = $name;
         app\DB::connect();
         app\DB::add_to_online($name);
 
@@ -39,14 +40,11 @@ if (isset($_SESSION['name'])) {
 
     <div class="container text-center">
 
-        <h2>Log In </h2>
-
+        <h2>Log In</h2>
         <hr>
-
-
         <form action="index.php" method="post">
             <div class="form-group text-left center-block" style=" width:50%;">
-                <label for="usr">UserName:</label>
+                <label for="usr">Username:</label>
                 <input placeholder="Enter You Username..." type="text" class="form-control" name="name" required>
             </div>
             <h4><input name="submit" id="submit" type="submit" class="btn-primary" value="Log In" /> <button class="btn-primary" type="reset"> Clear </button></h4>

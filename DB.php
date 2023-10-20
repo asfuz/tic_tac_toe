@@ -48,16 +48,48 @@ class DB
     }
 
     public static function add_to_online($name){
-        $_SESSION['Name'] =  $name;
+        $_SESSION['name'] =  $name;
         $sql = "DELETE FROM `online` WHERE plrname='$name'";
         self::$connection->query($sql);
         $sql = "INSERT INTO `online`(`plrname`) VALUES ('$name')";
         self::$connection->query($sql);
     }
 
-    public static function get_requests(){
-        $sql = "SELECT * FROM `requests`";
+    public static function get_requests($name){
+        $sql = "SELECT * FROM `requests` WHERE NOT `name`='$name'";
         return self::$connection->query($sql)->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function add_request($name){
+        $sql = "insert into `requests` (`name`) values ('$name')";
+        return self::$connection->query($sql);
+    }
+
+    public static function is_playing($name){
+        $sql = "SELECT * FROM `games` WHERE `pl_name`='$name' OR `pl2_name`='$name'";
+        $result = self::$connection->query($sql)->fetch_all(MYSQLI_ASSOC);
+        if(empty($result)){
+            return false;
+        }
+        return true;
+    }
+    public static function is_requested($name){
+        $sql = "SELECT * FROM `requests` WHERE `name`='$name'";
+        $result = self::$connection->query($sql)->fetch_all(MYSQLI_ASSOC);
+        if(empty($result)){
+            return false;
+        }
+        return true;
+    }
+
+
+    public static function start_play($name1, $name2){
+        $sql = "DELETE FROM `requests` WHERE `name` = '$name1'";
+        self::$connection->query($sql);
+        $sql = "DELETE FROM `requests` WHERE `name` = '$name2'";
+        self::$connection->query($sql);
+        $sql = "insert into `games` (`pl_name`, `pl2_name`) values ('$name1', '$name2')";
+        return self::$connection->query($sql);
     }
 
 
