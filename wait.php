@@ -27,15 +27,16 @@ if ($name == null) {
     include_once 'DB.php';
     app\DB::connect();
     $requests = app\DB::get_requests($name);
-    if (app\DB::is_playing($name)) {
-        header('Location: game.php');
+    if ($game_id = app\DB::is_playing($name)) {
+        header("Location: game.php?id=$game_id");
         exit();
     } else if (!app\DB::is_requested($name)) {
         app\DB::add_request($name);
         header('Location: refresh');
     } else if (count($requests) >= 1){
         $name2 = $requests[0]['name'];
-        app\DB::start_play($name, $name2);
+        $game = app\DB::start_play($name, $name2);
+        header('Location: game.php?');
     }
 
 

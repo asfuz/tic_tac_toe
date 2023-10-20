@@ -71,7 +71,7 @@ class DB
         if(empty($result)){
             return false;
         }
-        return true;
+        return $result[0]['id'];
     }
     public static function is_requested($name){
         $sql = "SELECT * FROM `requests` WHERE `name`='$name'";
@@ -90,6 +90,11 @@ class DB
         self::$connection->query($sql);
         $sql = "insert into `games` (`pl_name`, `pl2_name`) values ('$name1', '$name2')";
         return self::$connection->query($sql);
+    }
+
+    public static function get_game_by_id($game_id){
+        $sql = "SELECT * FROM `games` WHERE `id`='$game_id'";
+        return $result = self::$connection->query($sql)->fetch_all(MYSQLI_ASSOC)[0];
     }
 
 
