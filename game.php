@@ -33,7 +33,7 @@ session_start();
       ?>
     </h1>
   </div>
-  <div class="wrap">
+  <div class="wrap" id="wrap" hidden="hidden">
     <header>
 
       <div id="x_win"> <i class="fa fa-times" aria-hidden="true"> </i>
@@ -81,6 +81,75 @@ session_start();
     </footer>
   </div>
 
+  <h1>Ball Game</h1>
+  <button id="btnJoin">Join Game</button>
+
+
+  <script>
+    //HTML elements
+    let clientId = "<?= $_SESSION['name'] ?? 'null' ?>";
+    let gameId = <?= $_GET['id'] ?? 'null' ?>;
+
+    let ws = new WebSocket("ws://localhost:9090");
+    const btnJoin = document.getElementById("btnJoin");
+
+    //wiring events
+    btnJoin.addEventListener("click", (e) => {
+      if (gameId === null) gameId = <?= $_GET['id'] ?>;
+
+      let wrap = document.getElementById('wrap');
+      wrap.removeAttribute("hidden");
+
+      const payLoad = {
+        method: "join",
+        clientId: clientId,
+        game: {
+          gameId: gameId,
+          player: '1',
+        }
+      };
+
+      ws.send(JSON.stringify(payLoad));
+    });
+
+    ws.onmessage = (message) => {
+      //message.data
+      const response = JSON.parse(message.data);
+      //connect
+      if (response.method === "connect") {
+        clientId = response.clientId;
+        console.log("Client id Set successfully " + clientId);
+      }
+
+
+      //update
+      if (response.method === "update") {
+        //{1: "red", 1}
+        if (!response.game.state) return;
+        for (const b of Object.keys(response.game.state)) {
+            cell_click_js(response.game.state.cell, response.game.player, gameId);
+        }
+      }
+
+      //join
+      if (response.method === "join") {
+        const game = response.game;
+        gameId = <?= $_GET['id'] ?>;
+
+      }
+    };
+
+
+    function cell_click(cell) {
+      const payLoad = {
+        method: "play",
+        clientId: clientId,
+        gameId: gameId,
+        cell: cell,
+      };
+      ws.send(JSON.stringify(payLoad))
+    }
+  </script>
   <?php
   require_once 'javascript.php';
   ?>

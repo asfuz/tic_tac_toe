@@ -1,5 +1,9 @@
-
 <script type='text/javascript'>
+  function dd(data, text = "debug") {
+    console.log(text);
+    console.log(data);
+  }
+
   var countx = 0;
   var count = 0;
   var counto = 0;
@@ -10,7 +14,7 @@
   var o = '<span class="fa fa-circle-o fa-4x"></span>';
 
 
-  function cell_click(cell) {
+  function cell_click_js(cell, player = 0, gameId) {
     document.getElementById("result").innerHTML = "# result";
     var element = document.getElementById(cell);
 
@@ -18,19 +22,25 @@
     <?php
     $is_pl1 = $_SESSION['name'] == $_SESSION['pl_name'] ? '1' : '0';
     ?>
-    if (player == 1 && <?=$is_pl1?> == 1) {
+    if (player == 1) {
       element.innerHTML = x;
       element.style.color = "#547cd8";
       player -= 1;
       ++count;
-      winner();
-    } else if(player == 0 && <?=$is_pl1?> == 0){
+    } else if (player == 0) {
       element.innerHTML = o;
       element.style.color = "#01bbc2";
       player += 1;
       ++count;
-      winner();
     }
+    const payLoad = {
+        method: "player",
+        gameId: gameId,
+        cell: cell,
+        player: player
+      };
+      ws.send(JSON.stringify(payLoad))
+    winner();
   }
 
 
