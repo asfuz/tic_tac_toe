@@ -95,7 +95,7 @@ session_start();
 
     //wiring events
     btnJoin.addEventListener("click", (e) => {
-      if (gameId === null) gameId = <?= $_GET['id'] ?>;
+      if (gameId === null) gameId = "<?= $_GET['id'] ?>";
 
       let wrap = document.getElementById('wrap');
       wrap.removeAttribute("hidden");
@@ -108,7 +108,6 @@ session_start();
           player: '1',
         }
       };
-
       ws.send(JSON.stringify(payLoad));
     });
 
@@ -127,7 +126,7 @@ session_start();
         //{1: "red", 1}
         if (!response.game.state) return;
         for (const b of Object.keys(response.game.state)) {
-            cell_click_js(response.game.state.cell, response.game.player, gameId);
+          cell_click_js(response.game, clientId);
         }
       }
 

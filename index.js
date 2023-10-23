@@ -13,6 +13,7 @@ httpServer.listen(9090, () => console.log("Listening.. on 9090"));
 //hashmap clients
 const clients = {};
 const games = {};
+const turn = {};
 
 const wsServer = new websocketServer({
   httpServer: httpServer,
@@ -36,7 +37,6 @@ wsServer.on("request", (request) => {
       if (typeof gameId == "undefined") {
         console.log("ERROR: game not found");
       }
-      dd(games,1);
       if (games[gameId] == undefined) {
         games[gameId] = {
           id: gameId,
@@ -48,6 +48,12 @@ wsServer.on("request", (request) => {
           id: gameId,
           clients: [],
         };
+        if (typeof games[gameId.state == "undefined"]) {
+          let state = games[gameId].state;
+          if (!state) state = {};
+          state["cell"] = "denied";
+          games[gameId].state = state;
+        }
       }
 
       //start the game
@@ -60,12 +66,10 @@ wsServer.on("request", (request) => {
         method: "join",
         game: games[gameId],
       };
-      dd(games,2);
       //loop through all clients and tell them that people has joined
       games[gameId].clients.forEach((c) => {
         clients[c.clientId].connection.send(JSON.stringify(payLoad));
       });
-      dd(games,3);
 
       updateGameState();
     }
@@ -79,14 +83,13 @@ wsServer.on("request", (request) => {
     }
     if (result.method === "player") {
       const gameId = result.gameId;
-      let state = games[gameId].state;
-      if (!state) state = {};
-      state["cell"] = result.cell;
-      games[gameId].state = state;
-      games[gameId].player = result.player;
+        let state = games[gameId].state;
+        if (!state) state = {};
+        state["cell"] = result.cell;
+        games[gameId].state = state;
+        games[gameId].player = result.player;
     }
   });
-
   console.log(request);
   //generate a new clientId
   const clientId = guid();
@@ -105,15 +108,17 @@ wsServer.on("request", (request) => {
 function updateGameState() {
   //{"gameid", fasdfsf}
   for (const g of Object.keys(games)) {
-    const game = games[g];
-    const payLoad = {
-      method: "update",
-      game: game,
-    };
+    if (games[g].state["cell"] != "denied") {
+      const game = games[g];
+      const payLoad = {
+        method: "update",
+        game: game,
+      };
 
-    game.clients.forEach((c) => {
-      clients[c.clientId].connection.send(JSON.stringify(payLoad));
-    });
+      game.clients.forEach((c) => {
+        clients[c.clientId].connection.send(JSON.stringify(payLoad));
+      });
+    }
   }
 
   setTimeout(updateGameState, 1000);

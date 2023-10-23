@@ -14,7 +14,19 @@
   var o = '<span class="fa fa-circle-o fa-4x"></span>';
 
 
-  function cell_click_js(cell, player = 0, gameId) {
+  function cell_click_js(game, clientId) {
+    let cell = game.state.cell; 
+    let player = game.player;
+    let gameId = game.gameId;
+
+    if (cell == 'clear') {
+      reset();
+      return;
+    }
+    if (cell == 'denied') {
+      document.getElementById("result").innerHTML = "# wait your opponent";
+      return;
+    }
     document.getElementById("result").innerHTML = "# result";
     var element = document.getElementById(cell);
 
@@ -22,6 +34,7 @@
     <?php
     $is_pl1 = $_SESSION['name'] == $_SESSION['pl_name'] ? '1' : '0';
     ?>
+
     if (player == 1) {
       element.innerHTML = x;
       element.style.color = "#547cd8";
@@ -34,12 +47,13 @@
       ++count;
     }
     const payLoad = {
-        method: "player",
-        gameId: gameId,
-        cell: cell,
-        player: player
-      };
-      ws.send(JSON.stringify(payLoad))
+      method: "player",
+      gameId: gameId,
+      cell: cell,
+      player: player,
+      clientId: clientId,
+    };
+    ws.send(JSON.stringify(payLoad))
     winner();
   }
 
@@ -57,6 +71,7 @@
       document.getElementById("result").innerHTML = "# X won";
       ++countx;
       document.getElementById("xx").innerHTML = countx + "&nbsp;" + "wins";
+      switchxo();
       reset();
       count = 0;
       //  document.getElementById("result").innerHTML= "result";
@@ -72,6 +87,7 @@
       document.getElementById("result").innerHTML = "# O won";
       ++counto;
       document.getElementById("ooo").innerHTML = counto + "&nbsp;" + "wins";
+      switchxo();
       reset();
       count = 0;
       //document.getElementById("result").innerHTML= "result";
@@ -79,15 +95,22 @@
       ++count_draws;
       document.getElementById("draw0").innerHTML = count_draws + "&nbsp;" + "draws";
       document.getElementById("result").innerHTML = "# draw";
+      switchxo();
       reset();
       count = 0;
-
       // document.getElementById("result").innerHTML= "result";
     }
   }
 
   function reset() {
     //reset buttons to empty
+    const payLoad = {
+      method: "player",
+      gameId: gameId,
+      cell: 'clear',
+      player: player
+    };
+    ws.send(JSON.stringify(payLoad));
 
     document.getElementById("cell_1").innerHTML = "";
     document.getElementById("cell_2").innerHTML = "";
@@ -105,6 +128,11 @@
   function switchxo() {
     reset();
     var check = document.getElementById("myCheckBox").checked;
+    if (check) {
+      document.getElementById("myCheckBox").checked = false;
+    } else {
+      document.getElementById("myCheckBox").checked = true;
+    }
     if (!checkcheck) {
       player = 1;
     } else {
